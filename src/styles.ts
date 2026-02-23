@@ -1,41 +1,39 @@
 let injected = false;
 
 export const CSS = /* css */ `
-/* Animation & visibility only — positioning is up to you */
+/* Hidden by default — safe to also set display:none in Webflow */
 [data-cc="banner"] {
+  display: none !important;
   z-index: 999999;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition: opacity 0.35s ease;
 }
 
 [data-cc="banner"].cc-visible {
+  display: block !important;
   opacity: 1;
   pointer-events: auto;
 }
 
 [data-cc="notice"].cc-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  position: absolute;
+  display: none !important;
 }
 
 [data-cc="preferences-panel"] {
-  display: none;
+  display: none !important;
 }
 
 [data-cc="preferences-panel"].cc-visible {
-  display: block;
+  display: block !important;
 }
 
-/* Overlay behind preferences panel */
 [data-cc="overlay"] {
-  display: none;
+  display: none !important;
 }
 
 [data-cc="overlay"].cc-visible {
-  display: block;
+  display: block !important;
 }
 `;
 
