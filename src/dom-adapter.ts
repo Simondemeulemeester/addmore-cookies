@@ -102,12 +102,14 @@ function applyUIState(uiState: UIState) {
   const banner = $('[data-cc="banner"]');
   const notice = $('[data-cc="notice"]');
   const prefs = $('[data-cc="preferences-panel"]');
+  const overlay = $('[data-cc="overlay"]');
 
   if (!banner) return;
 
   switch (uiState) {
     case 'hidden':
       banner.classList.remove('cc-visible');
+      overlay?.classList.remove('cc-visible');
       if (previousFocus) {
         previousFocus.focus();
         previousFocus = null;
@@ -118,6 +120,7 @@ function applyUIState(uiState: UIState) {
       banner.classList.add('cc-visible');
       notice?.classList.remove('cc-hidden');
       prefs?.classList.remove('cc-visible');
+      overlay?.classList.remove('cc-visible');
       if (!previousFocus) previousFocus = document.activeElement as HTMLElement;
       // Focus the banner after transition
       setTimeout(() => {
@@ -130,6 +133,7 @@ function applyUIState(uiState: UIState) {
       banner.classList.add('cc-visible');
       notice?.classList.add('cc-hidden');
       prefs?.classList.add('cc-visible');
+      overlay?.classList.add('cc-visible');
       syncToggles();
       if (prefs) {
         setTimeout(() => trapFocus(prefs), 50);
@@ -190,6 +194,14 @@ export function bindDOM(): void {
   // Close / dismiss
   for (const btn of $$('[data-cc-action="close"]')) {
     on(btn, 'click', () => hideUI());
+  }
+
+  // Overlay click → close preferences
+  const overlay = $('[data-cc="overlay"]');
+  if (overlay) {
+    on(overlay, 'click', () => {
+      if (getUIState() === 'preferences') showBanner();
+    });
   }
 
   // Escape key to close preferences → back to notice

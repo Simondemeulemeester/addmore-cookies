@@ -23,26 +23,31 @@
   -->
 
   <style>
-    /* ── Page styles (your Webflow design) ── */
+    /* ── Page styles ── */
     * { margin: 0; box-sizing: border-box; }
     body { font-family: system-ui, sans-serif; padding: 2rem; background: #f5f5f5; }
     h1 { margin-bottom: 1rem; }
 
-    /* ── Cookie banner styles (customise to match your brand) ── */
-    [data-cc="banner"] {
-      background: #fff;
-      border-top: 1px solid #e0e0e0;
-      padding: 1.5rem 2rem;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    /* ── Notice card (bottom-right) ── */
+    .cc-banner {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      max-width: 420px;
       font-size: 0.9rem;
     }
-    [data-cc="notice"] { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-    [data-cc="notice"] p { flex: 1; min-width: 200px; margin: 0; color: #333; }
-    .cc-buttons { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .cc-notice {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    }
+    .cc-notice p { margin: 0 0 1rem; color: #333; line-height: 1.5; }
+    .cc-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
     .cc-buttons button {
       padding: 0.5rem 1rem;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
       background: #fff;
       cursor: pointer;
       font-size: 0.85rem;
@@ -53,16 +58,38 @@
       border-color: #111;
     }
 
-    /* Preferences panel */
-    [data-cc="preferences-panel"] { padding-top: 1rem; }
-    .cc-category { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid #eee; }
+    /* ── Preferences modal (centered) ── */
+    .cc-preferences {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 560px;
+      width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    }
+    .cc-preferences h3 { margin: 0 0 1rem; }
+    .cc-category { padding: 0.75rem 0; border-bottom: 1px solid #eee; }
     .cc-category label { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; }
     .cc-category p { margin: 0.25rem 0 0; color: #666; font-size: 0.85rem; }
     .cc-pref-actions { display: flex; gap: 0.5rem; padding-top: 1rem; }
-    .cc-pref-actions button { padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 0.85rem; background: #fff; }
+    .cc-pref-actions button { padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 0.85rem; background: #fff; }
     .cc-pref-actions button[data-cc-action="save-preferences"] { background: #111; color: #fff; border-color: #111; }
 
-    /* Manage link */
+    /* ── Overlay ── */
+    .cc-overlay {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999998;
+    }
+
+    /* ── Manage link ── */
     .manage-link { margin-top: 2rem; }
     .manage-link button { background: none; border: none; color: #666; text-decoration: underline; cursor: pointer; font-size: 0.85rem; }
   </style>
@@ -76,13 +103,11 @@
     <button data-cc-action="manage">Manage Cookie Settings</button>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- Cookie Banner HTML — paste this into a Webflow embed   -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div data-cc="banner">
+  <!-- Banner wrapper -->
+  <div class="cc-banner" data-cc="banner">
 
-    <!-- Notice (initial view) -->
-    <div data-cc="notice">
+    <!-- Notice card (bottom-right) -->
+    <div class="cc-notice" data-cc="notice">
       <p>We use cookies to enhance your experience. You can choose which cookies to allow.</p>
       <div class="cc-buttons">
         <button data-cc-action="accept-all">Accept All</button>
@@ -91,31 +116,24 @@
       </div>
     </div>
 
-    <!-- Preferences panel (toggled) -->
-    <div data-cc="preferences-panel">
+    <!-- Preferences modal (centered) -->
+    <div class="cc-preferences" data-cc="preferences-panel">
+      <h3>Cookie preferences</h3>
       <div class="cc-category">
-        <div>
-          <label><input type="checkbox" checked disabled /> Necessary</label>
-          <p>Essential for the website to function. Always enabled.</p>
-        </div>
+        <label><input type="checkbox" checked disabled /> Necessary</label>
+        <p>Essential for the website to function. Always enabled.</p>
       </div>
       <div class="cc-category">
-        <div>
-          <label><input type="checkbox" data-cc-toggle="functional" /> Functional</label>
-          <p>Enable enhanced functionality and personalisation.</p>
-        </div>
+        <label><input type="checkbox" data-cc-toggle="functional" /> Functional</label>
+        <p>Enable enhanced functionality and personalisation.</p>
       </div>
       <div class="cc-category">
-        <div>
-          <label><input type="checkbox" data-cc-toggle="analytics" /> Analytics</label>
-          <p>Help us understand how visitors interact with our website.</p>
-        </div>
+        <label><input type="checkbox" data-cc-toggle="analytics" /> Analytics</label>
+        <p>Help us understand how visitors interact with our website.</p>
       </div>
       <div class="cc-category">
-        <div>
-          <label><input type="checkbox" data-cc-toggle="marketing" /> Marketing</label>
-          <p>Used to deliver relevant ads and track campaigns.</p>
-        </div>
+        <label><input type="checkbox" data-cc-toggle="marketing" /> Marketing</label>
+        <p>Used to deliver relevant ads and track campaigns.</p>
       </div>
       <div class="cc-pref-actions">
         <button data-cc-action="save-preferences">Save Preferences</button>
@@ -124,6 +142,9 @@
     </div>
 
   </div>
+
+  <!-- Overlay (behind preferences modal) -->
+  <div class="cc-overlay" data-cc="overlay"></div>
 
   <!-- Debug helper -->
   <script>

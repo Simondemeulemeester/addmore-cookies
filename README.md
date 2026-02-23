@@ -26,103 +26,131 @@ Lightweight, GDPR/ePrivacy-compliant cookie consent with Google Consent Mode v2 
 
 ## Webflow
 
-The IIFE bundle is fully self-contained — it injects its own CSS for animations and positioning. You just provide the HTML structure and your own visual styles.
+The IIFE bundle is fully self-contained — it auto-inits and injects minimal CSS for show/hide logic. You build the banner as native Webflow elements, style it however you want, and the library handles the rest via `data-cc` attributes.
 
 ### 1. Add the script
 
-Add this in your **Page Settings → Head Code** (or site-wide via Custom Code), **before** your GTM snippet:
+Add this in **Site Settings → Custom Code → Head Code**, **before** your GTM snippet:
 
 ```html
 <script src="https://your-cdn.com/cookie-consent.min.js"></script>
 ```
 
-That's it. The script auto-initialises with sensible defaults.
+That's it — one script tag, auto-initialises with sensible defaults.
 
-If you need to override config for a specific site (e.g. custom domain or version bump), add this **before** the script tag:
+To override config for a specific site (e.g. version bump or custom domain), add this **before** the script:
 
 ```html
 <script>window.__CC_CONFIG__ = { consentVersion: '2', cookieDomain: '.example.com' };</script>
-<script src="https://your-cdn.com/cookie-consent.min.js"></script>
 ```
 
-### 2. Add the banner HTML
+### 2. Build the banner as a Webflow Symbol
 
-Paste this into a site-wide **Embed** element (or in the Before `</body>` tag custom code). Style it however you like — the library reads `data-cc` attributes, not class names.
+Create these elements in Webflow using the element panel (not an embed). Add custom attributes via the element settings gear icon. Wrap everything in a **Symbol** so it appears on every page.
 
-```html
-<div data-cc="banner">
+#### Structure
 
-  <!-- Notice (initial view) -->
-  <div data-cc="notice">
-    <p>We use cookies to enhance your experience. You can choose which cookies to allow.</p>
-    <div>
-      <button data-cc-action="accept-all">Accept All</button>
-      <button data-cc-action="reject-all">Reject All</button>
-      <button data-cc-action="show-preferences">Customize</button>
-    </div>
-  </div>
-
-  <!-- Preferences panel -->
-  <div data-cc="preferences-panel">
-    <div>
-      <label><input type="checkbox" checked disabled /> Necessary</label>
-      <p>Essential for the website to function. Always enabled.</p>
-    </div>
-    <div>
-      <label><input type="checkbox" data-cc-toggle="functional" /> Functional</label>
-      <p>Enable enhanced functionality and personalisation.</p>
-    </div>
-    <div>
-      <label><input type="checkbox" data-cc-toggle="analytics" /> Analytics</label>
-      <p>Help us understand how visitors interact with our website.</p>
-    </div>
-    <div>
-      <label><input type="checkbox" data-cc-toggle="marketing" /> Marketing</label>
-      <p>Used to deliver relevant ads and track campaigns.</p>
-    </div>
-    <div>
-      <button data-cc-action="save-preferences">Save Preferences</button>
-      <button data-cc-action="reject-all">Reject All</button>
-    </div>
-  </div>
-
-</div>
 ```
+div "cc-banner"                        → attr: data-cc="banner"
+│
+├── div "cc-notice"                    → attr: data-cc="notice"
+│   ├── paragraph (your cookie message)
+│   └── div "cc-buttons"
+│       ├── button "Accept All"        → attr: data-cc-action="accept-all"
+│       ├── button "Reject All"        → attr: data-cc-action="reject-all"
+│       └── button "Customize"         → attr: data-cc-action="show-preferences"
+│
+└── div "cc-preferences"               → attr: data-cc="preferences-panel"
+    ├── heading "Cookie preferences"
+    ├── div "cc-category"
+    │   ├── checkbox (checked + disabled)
+    │   ├── text "Necessary"
+    │   └── paragraph "Essential for the website to function."
+    ├── div "cc-category"
+    │   ├── checkbox                   → attr: data-cc-toggle="functional"
+    │   ├── text "Functional"
+    │   └── paragraph "Enhanced functionality and personalisation."
+    ├── div "cc-category"
+    │   ├── checkbox                   → attr: data-cc-toggle="analytics"
+    │   ├── text "Analytics"
+    │   └── paragraph "Helps us understand how visitors use the site."
+    ├── div "cc-category"
+    │   ├── checkbox                   → attr: data-cc-toggle="marketing"
+    │   ├── text "Marketing"
+    │   └── paragraph "Used for relevant ads and campaign tracking."
+    └── div "cc-pref-actions"
+        ├── button "Save Preferences"  → attr: data-cc-action="save-preferences"
+        └── button "Reject All"        → attr: data-cc-action="reject-all"
+
+div "cc-overlay"                       → attr: data-cc="overlay"
+```
+
+> The overlay is a **sibling** of the banner, not inside it. It sits behind the preferences modal.
+
+#### Suggested Webflow styles
+
+**`cc-banner`** (the notice card — bottom right):
+- Position: Fixed
+- Bottom: 24px, Right: 24px
+- Max Width: 420px
+- Z-Index: 999999
+
+**`cc-notice`**: style freely (padding, background, border-radius, shadow, etc.)
+
+**`cc-preferences`** (centered modal):
+- Position: Fixed
+- Top: 50%, Left: 50%
+- Transform: translate(-50%, -50%)
+- Max Width: 560px, Width: 90vw
+- Max Height: 80vh, Overflow: Auto
+- Z-Index: 999999
+- Background, padding, border-radius, shadow — your design
+
+**`cc-overlay`** (dim backdrop):
+- Position: Fixed
+- Top: 0, Right: 0, Bottom: 0, Left: 0
+- Background: rgba(0, 0, 0, 0.5)
+- Z-Index: 999998
+
+**Checkboxes**: use Webflow's native checkbox element. No form wrapper needed — the library reads the checked state directly. Just make sure the custom attribute is on the `input` element itself.
 
 ### 3. "Manage cookies" link
 
-Place this button anywhere on your site (e.g. the footer). It re-opens the banner with preferences pre-populated:
+Place a button or link anywhere (e.g. your footer Symbol):
 
-```html
-<button data-cc-action="manage">Manage Cookie Settings</button>
 ```
+button or link "Manage Cookie Settings"  → attr: data-cc-action="manage"
+```
+
+This re-opens the banner with the preferences panel and current selections pre-populated.
+
+### How it works
+
+The library injects a small `<style>` tag that handles show/hide logic only:
+
+- `.cc-visible` — makes elements visible (added/removed automatically)
+- `.cc-hidden` — hides elements (added/removed automatically)
+- Fade transition on the banner wrapper
+
+All visual styling (colors, fonts, spacing, layout) is entirely yours in Webflow. The library never touches your classes — it only toggles its own `cc-visible` / `cc-hidden` classes.
 
 ### Data attributes reference
 
 | Attribute | Element | Purpose |
 |---|---|---|
-| `data-cc="banner"` | Wrapper `div` | The banner container (animated in/out) |
-| `data-cc="notice"` | Inner `div` | The initial notice view |
-| `data-cc="preferences-panel"` | Inner `div` | The expandable preferences panel |
-| `data-cc-action="accept-all"` | `button` | Accept all categories |
-| `data-cc-action="reject-all"` | `button` | Reject all optional categories |
-| `data-cc-action="show-preferences"` | `button` | Open the preferences panel |
-| `data-cc-action="save-preferences"` | `button` | Save current toggle selections |
-| `data-cc-action="manage"` | `button` | Re-open the banner (for footer links) |
-| `data-cc-action="close"` | `button` | Hide the banner |
-| `data-cc-toggle="functional"` | `input[checkbox]` | Toggle for functional cookies |
-| `data-cc-toggle="analytics"` | `input[checkbox]` | Toggle for analytics cookies |
-| `data-cc-toggle="marketing"` | `input[checkbox]` | Toggle for marketing cookies |
-
-### Injected CSS
-
-The script automatically injects a `<style data-cc-styles>` tag with minimal animation rules:
-
-- `[data-cc="banner"]` — fixed position, fade + slide-up transition
-- `.cc-visible` / `.cc-hidden` — toggled by the library to show/hide elements
-- `[data-cc="preferences-panel"]` — max-height transition for smooth expand/collapse
-
-All visual styling (colors, fonts, spacing, etc.) is up to you.
+| `data-cc="banner"` | Wrapper div | The banner container (faded in/out) |
+| `data-cc="notice"` | Inner div | The notice view (hidden when preferences open) |
+| `data-cc="preferences-panel"` | Inner div | The preferences modal (shown/hidden) |
+| `data-cc="overlay"` | Sibling div | Backdrop behind preferences (shown/hidden, click to close) |
+| `data-cc-action="accept-all"` | Button | Accept all categories |
+| `data-cc-action="reject-all"` | Button | Reject all optional categories |
+| `data-cc-action="show-preferences"` | Button | Open the preferences panel |
+| `data-cc-action="save-preferences"` | Button | Save current toggle selections |
+| `data-cc-action="manage"` | Button/link | Re-open banner with preferences (for footer) |
+| `data-cc-action="close"` | Button | Dismiss the banner |
+| `data-cc-toggle="functional"` | Checkbox input | Toggle for functional cookies |
+| `data-cc-toggle="analytics"` | Checkbox input | Toggle for analytics cookies |
+| `data-cc-toggle="marketing"` | Checkbox input | Toggle for marketing cookies |
 
 ---
 
