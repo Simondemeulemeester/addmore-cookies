@@ -1,0 +1,41 @@
+{
+  "name": "@addmore/cookie-consent",
+  "version": "1.0.0",
+  "description": "Lightweight GDPR/ePrivacy-compliant cookie consent with Google Consent Mode v2 + GTM integration",
+  "type": "module",
+  "main": "dist/cookie-consent.esm.js",
+  "module": "dist/cookie-consent.esm.js",
+  "types": "dist/core.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/cookie-consent.esm.js",
+      "types": "./dist/core.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react/index.js",
+      "types": "./dist/react/index.d.ts"
+    },
+    "./iife": "./dist/cookie-consent.min.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "size": "node build.mjs && gzip -c dist/cookie-consent.min.js | wc -c"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "react-dom": { "optional": true }
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.0",
+    "@types/react": "^18.3.0"
+  },
+  "license": "MIT"
+}

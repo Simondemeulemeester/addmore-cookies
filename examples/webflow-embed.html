@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cookie Consent — Webflow Example</title>
+
+  <!-- 1. Load the IIFE bundle (injects CSS automatically) -->
+  <script src="../dist/cookie-consent.min.js"></script>
+
+  <!-- 2. Initialise BEFORE GTM so consent defaults are set -->
+  <script>
+    window.CookieConsent.init({
+      cookieName: 'cc_consent',
+      consentVersion: '1',
+      // cookieDomain: '.example.com', // uncomment for production
+    });
+  </script>
+
+  <!-- 3. Google Tag Manager (loads AFTER consent defaults are set) -->
+  <!--
+  <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-XXXXXXX');
+  </script>
+  -->
+
+  <style>
+    /* ── Page styles (your Webflow design) ── */
+    * { margin: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; padding: 2rem; background: #f5f5f5; }
+    h1 { margin-bottom: 1rem; }
+
+    /* ── Cookie banner styles (customise to match your brand) ── */
+    [data-cc="banner"] {
+      background: #fff;
+      border-top: 1px solid #e0e0e0;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+      font-size: 0.9rem;
+    }
+    [data-cc="notice"] { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+    [data-cc="notice"] p { flex: 1; min-width: 200px; margin: 0; color: #333; }
+    .cc-buttons { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .cc-buttons button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .cc-buttons button[data-cc-action="accept-all"] {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    /* Preferences panel */
+    [data-cc="preferences-panel"] { padding-top: 1rem; }
+    .cc-category { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid #eee; }
+    .cc-category label { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; }
+    .cc-category p { margin: 0.25rem 0 0; color: #666; font-size: 0.85rem; }
+    .cc-pref-actions { display: flex; gap: 0.5rem; padding-top: 1rem; }
+    .cc-pref-actions button { padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 0.85rem; background: #fff; }
+    .cc-pref-actions button[data-cc-action="save-preferences"] { background: #111; color: #fff; border-color: #111; }
+
+    /* Manage link */
+    .manage-link { margin-top: 2rem; }
+    .manage-link button { background: none; border: none; color: #666; text-decoration: underline; cursor: pointer; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <h1>My Website</h1>
+  <p>This page demonstrates the cookie consent banner.</p>
+
+  <!-- Manage cookies link (can be placed anywhere) -->
+  <div class="manage-link">
+    <button data-cc-action="manage">Manage Cookie Settings</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- Cookie Banner HTML — paste this into a Webflow embed   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div data-cc="banner">
+
+    <!-- Notice (initial view) -->
+    <div data-cc="notice">
+      <p>We use cookies to enhance your experience. You can choose which cookies to allow.</p>
+      <div class="cc-buttons">
+        <button data-cc-action="accept-all">Accept All</button>
+        <button data-cc-action="reject-all">Reject All</button>
+        <button data-cc-action="show-preferences">Customize</button>
+      </div>
+    </div>
+
+    <!-- Preferences panel (toggled) -->
+    <div data-cc="preferences-panel">
+      <div class="cc-category">
+        <div>
+          <label><input type="checkbox" checked disabled /> Necessary</label>
+          <p>Essential for the website to function. Always enabled.</p>
+        </div>
+      </div>
+      <div class="cc-category">
+        <div>
+          <label><input type="checkbox" data-cc-toggle="functional" /> Functional</label>
+          <p>Enable enhanced functionality and personalisation.</p>
+        </div>
+      </div>
+      <div class="cc-category">
+        <div>
+          <label><input type="checkbox" data-cc-toggle="analytics" /> Analytics</label>
+          <p>Help us understand how visitors interact with our website.</p>
+        </div>
+      </div>
+      <div class="cc-category">
+        <div>
+          <label><input type="checkbox" data-cc-toggle="marketing" /> Marketing</label>
+          <p>Used to deliver relevant ads and track campaigns.</p>
+        </div>
+      </div>
+      <div class="cc-pref-actions">
+        <button data-cc-action="save-preferences">Save Preferences</button>
+        <button data-cc-action="reject-all">Reject All</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Debug helper -->
+  <script>
+    window.CookieConsent.onConsentChange(function(state, action) {
+      console.log('Consent changed:', action, state.categories);
+    });
+    console.log('dataLayer:', window.dataLayer);
+  </script>
+</body>
+</html>
