@@ -103,7 +103,10 @@
     <button data-cc-action="manage">Manage Cookie Settings</button>
   </div>
 
-  <!-- Banner wrapper -->
+  <!-- Cookie consent wrapper (display:none in Webflow, script overrides) -->
+  <div data-cc="wrapper" style="display:none">
+
+  <!-- Banner -->
   <div class="cc-banner" data-cc="banner">
 
     <!-- Notice card (bottom-right) -->
@@ -145,6 +148,8 @@
 
   <!-- Overlay (behind preferences modal) -->
   <div class="cc-overlay" data-cc="overlay"></div>
+
+  </div><!-- /cc-wrapper -->
 
   <!-- Debug helper -->
   <script>

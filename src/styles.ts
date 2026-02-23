@@ -1,7 +1,11 @@
 let injected = false;
 
 export const CSS = /* css */ `
-/* Hidden by default — safe to also set display:none in Webflow */
+/* Force wrapper visible — safe to set display:none on it in Webflow */
+[data-cc="wrapper"] {
+  display: block !important;
+}
+
 [data-cc="banner"] {
   display: none !important;
   z-index: 999999;

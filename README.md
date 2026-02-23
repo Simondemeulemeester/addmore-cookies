@@ -51,43 +51,47 @@ Create these elements in Webflow using the element panel (not an embed). Add cus
 #### Structure
 
 ```
-div "cc-banner"                        → attr: data-cc="banner"
+div "cc-wrapper"                       → attr: data-cc="wrapper", display: none
 │
-├── div "cc-notice"                    → attr: data-cc="notice"
-│   ├── paragraph (your cookie message)
-│   └── div "cc-buttons"
-│       ├── button "Accept All"        → attr: data-cc-action="accept-all"
-│       ├── button "Reject All"        → attr: data-cc-action="reject-all"
-│       └── button "Customize"         → attr: data-cc-action="show-preferences"
+├── div "cc-banner"                    → attr: data-cc="banner"
+│   │
+│   ├── div "cc-notice"               → attr: data-cc="notice"
+│   │   ├── paragraph (your cookie message)
+│   │   └── div "cc-buttons"
+│   │       ├── button "Accept All"        → attr: data-cc-action="accept-all"
+│   │       ├── button "Reject All"        → attr: data-cc-action="reject-all"
+│   │       └── button "Customize"         → attr: data-cc-action="show-preferences"
+│   │
+│   └── div "cc-preferences"          → attr: data-cc="preferences-panel"
+│       ├── heading "Cookie preferences"
+│       ├── div "cc-category"
+│       │   ├── checkbox (checked + disabled)
+│       │   ├── text "Necessary"
+│       │   └── paragraph "Essential for the website to function."
+│       ├── div "cc-category"
+│       │   ├── checkbox               → attr: data-cc-toggle="functional"
+│       │   ├── text "Functional"
+│       │   └── paragraph "Enhanced functionality and personalisation."
+│       ├── div "cc-category"
+│       │   ├── checkbox               → attr: data-cc-toggle="analytics"
+│       │   ├── text "Analytics"
+│       │   └── paragraph "Helps us understand how visitors use the site."
+│       ├── div "cc-category"
+│       │   ├── checkbox               → attr: data-cc-toggle="marketing"
+│       │   ├── text "Marketing"
+│       │   └── paragraph "Used for relevant ads and campaign tracking."
+│       └── div "cc-pref-actions"
+│           ├── button "Save Preferences"  → attr: data-cc-action="save-preferences"
+│           └── button "Reject All"        → attr: data-cc-action="reject-all"
 │
-└── div "cc-preferences"               → attr: data-cc="preferences-panel"
-    ├── heading "Cookie preferences"
-    ├── div "cc-category"
-    │   ├── checkbox (checked + disabled)
-    │   ├── text "Necessary"
-    │   └── paragraph "Essential for the website to function."
-    ├── div "cc-category"
-    │   ├── checkbox                   → attr: data-cc-toggle="functional"
-    │   ├── text "Functional"
-    │   └── paragraph "Enhanced functionality and personalisation."
-    ├── div "cc-category"
-    │   ├── checkbox                   → attr: data-cc-toggle="analytics"
-    │   ├── text "Analytics"
-    │   └── paragraph "Helps us understand how visitors use the site."
-    ├── div "cc-category"
-    │   ├── checkbox                   → attr: data-cc-toggle="marketing"
-    │   ├── text "Marketing"
-    │   └── paragraph "Used for relevant ads and campaign tracking."
-    └── div "cc-pref-actions"
-        ├── button "Save Preferences"  → attr: data-cc-action="save-preferences"
-        └── button "Reject All"        → attr: data-cc-action="reject-all"
-
-div "cc-overlay"                       → attr: data-cc="overlay"
+└── div "cc-overlay"                   → attr: data-cc="overlay"
 ```
 
-> The overlay is a **sibling** of the banner, not inside it. It sits behind the preferences modal.
+> Set **`display: none`** on `cc-wrapper` in Webflow so the banner is hidden in the editor canvas. The script overrides this at runtime with `display: block !important` — your elements stay invisible in the designer but work on the live site.
 
 #### Suggested Webflow styles
+
+**`cc-wrapper`**: Display: None (keeps everything hidden in the Webflow editor)
 
 **`cc-banner`** (the notice card — bottom right):
 - Position: Fixed
@@ -138,7 +142,8 @@ All visual styling (colors, fonts, spacing, layout) is entirely yours in Webflow
 
 | Attribute | Element | Purpose |
 |---|---|---|
-| `data-cc="banner"` | Wrapper div | The banner container (faded in/out) |
+| `data-cc="wrapper"` | Outer div | Wraps everything; set `display: none` in Webflow, script overrides at runtime |
+| `data-cc="banner"` | Inner div | The banner container (faded in/out) |
 | `data-cc="notice"` | Inner div | The notice view (hidden when preferences open) |
 | `data-cc="preferences-panel"` | Inner div | The preferences modal (shown/hidden) |
 | `data-cc="overlay"` | Sibling div | Backdrop behind preferences (shown/hidden, click to close) |
