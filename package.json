@@ -1,6 +1,6 @@
 {
   "name": "@addmore/cookie-consent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight GDPR/ePrivacy-compliant cookie consent with Google Consent Mode v2 + GTM integration",
   "type": "module",
   "main": "dist/cookie-consent.esm.js",
@@ -22,15 +22,23 @@
   ],
   "scripts": {
     "build": "node build.mjs",
-    "size": "node build.mjs && gzip -c dist/cookie-consent.min.js | wc -c"
+    "size": "node build.mjs && gzip -c dist/cookie-consent.min.js | wc -c",
+    "release": "node release.mjs",
+    "release:patch": "node release.mjs patch",
+    "release:minor": "node release.mjs minor",
+    "release:major": "node release.mjs major"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true },
-    "react-dom": { "optional": true }
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "esbuild": "^0.24.0",
