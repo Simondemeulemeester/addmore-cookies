@@ -28,22 +28,22 @@ Lightweight, GDPR/ePrivacy-compliant cookie consent with Google Consent Mode v2 
 
 The IIFE bundle is fully self-contained — it injects its own CSS for animations and positioning. You just provide the HTML structure and your own visual styles.
 
-### 1. Load the script
+### 1. Add the script
 
-Add this in your **Page Settings → Head Code** (or site-wide via Custom Code):
+Add this in your **Page Settings → Head Code** (or site-wide via Custom Code), **before** your GTM snippet:
 
 ```html
 <script src="https://your-cdn.com/cookie-consent.min.js"></script>
-<script>
-  window.CookieConsent.init({
-    cookieName: 'cc_consent',
-    consentVersion: '1',
-    // cookieDomain: '.example.com',  // set this in production
-  });
-</script>
 ```
 
-Place this **before** your Google Tag Manager snippet so consent defaults are set first.
+That's it. The script auto-initialises with sensible defaults.
+
+If you need to override config for a specific site (e.g. custom domain or version bump), add this **before** the script tag:
+
+```html
+<script>window.__CC_CONFIG__ = { consentVersion: '2', cookieDomain: '.example.com' };</script>
+<script src="https://your-cdn.com/cookie-consent.min.js"></script>
+```
 
 ### 2. Add the banner HTML
 

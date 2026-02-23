@@ -55,7 +55,7 @@ export {
   destroy,
 };
 
-// IIFE: attach to window
+// IIFE: attach to window + auto-init
 if (typeof window !== 'undefined') {
   window.CookieConsent = {
     init,
@@ -75,4 +75,8 @@ if (typeof window !== 'undefined') {
     openManage,
     destroy,
   } as unknown as typeof import('./core');
+
+  // Auto-init: reads optional config from window.__CC_CONFIG__
+  const cfg = (window as unknown as Record<string, unknown>).__CC_CONFIG__ as ConsentConfig | undefined;
+  init(cfg ?? {});
 }

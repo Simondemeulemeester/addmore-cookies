@@ -5,17 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cookie Consent — Webflow Example</title>
 
-  <!-- 1. Load the IIFE bundle (injects CSS automatically) -->
-  <script src="../dist/cookie-consent.min.js"></script>
+  <!-- 1. (Optional) Custom config — only needed if you want to override defaults -->
+  <!-- <script>window.__CC_CONFIG__ = { consentVersion: '2', cookieDomain: '.example.com' };</script> -->
 
-  <!-- 2. Initialise BEFORE GTM so consent defaults are set -->
-  <script>
-    window.CookieConsent.init({
-      cookieName: 'cc_consent',
-      consentVersion: '1',
-      // cookieDomain: '.example.com', // uncomment for production
-    });
-  </script>
+  <!-- 2. Load the script — auto-initialises with consent defaults before GTM -->
+  <script src="../dist/cookie-consent.min.js"></script>
 
   <!-- 3. Google Tag Manager (loads AFTER consent defaults are set) -->
   <!--
