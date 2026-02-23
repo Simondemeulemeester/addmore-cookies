@@ -1,43 +1,43 @@
 let injected = false;
 
 export const CSS = /* css */ `
-/* Force wrapper visible — safe to set display:none on it in Webflow */
-[data-cc="wrapper"] {
-  display: block !important;
-}
-
-[data-cc="banner"] {
-  display: none !important;
-  z-index: 999999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
-}
-
-[data-cc="banner"].cc-visible {
-  display: block !important;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-[data-cc="notice"].cc-hidden {
-  display: none !important;
-}
-
-[data-cc="preferences-panel"] {
-  display: none !important;
-}
-
-[data-cc="preferences-panel"].cc-visible {
-  display: block !important;
-}
-
+/* Everything hidden by default */
+[data-cc="banner"],
+[data-cc="notice"],
+[data-cc="preferences-panel"],
 [data-cc="overlay"] {
-  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+/* Banner visible (notice state) */
+[data-cc="banner"].cc-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* Notice visible inside banner */
+[data-cc="notice"].cc-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* Preferences panel visible */
+[data-cc="preferences-panel"].cc-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* Overlay visible */
 [data-cc="overlay"].cc-visible {
-  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
 }
 `;
 

@@ -65,6 +65,20 @@ function trapFocus(container: HTMLElement) {
 }
 
 // ---------------------------------------------------------------------------
+// Webflow checkbox helper
+// ---------------------------------------------------------------------------
+
+function findToggle(cat: string): HTMLInputElement | null {
+  // Direct input with the attribute
+  const direct = $<HTMLInputElement>(`input[data-cc-toggle="${cat}"]`);
+  if (direct) return direct;
+  // Webflow wraps checkboxes — attribute may be on a parent, find the input inside
+  const wrapper = $<HTMLElement>(`[data-cc-toggle="${cat}"]`);
+  if (wrapper) return wrapper.querySelector<HTMLInputElement>('input[type="checkbox"]');
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Sync toggles from current consent
 // ---------------------------------------------------------------------------
 
@@ -73,7 +87,7 @@ function syncToggles() {
   const categories: ConsentCategory[] = ['functional', 'analytics', 'marketing'];
 
   for (const cat of categories) {
-    const toggle = $<HTMLInputElement>(`[data-cc-toggle="${cat}"]`);
+    const toggle = findToggle(cat);
     if (toggle) {
       toggle.checked = consent?.categories[cat] ?? false;
     }
@@ -88,10 +102,22 @@ function readToggles(): Partial<Record<ConsentCategory, boolean>> {
   const cats: Partial<Record<ConsentCategory, boolean>> = {};
   const toggleable: ConsentCategory[] = ['functional', 'analytics', 'marketing'];
   for (const cat of toggleable) {
-    const toggle = $<HTMLInputElement>(`[data-cc-toggle="${cat}"]`);
+    const toggle = findToggle(cat);
     if (toggle) cats[cat] = toggle.checked;
   }
   return cats;
+}
+
+// ---------------------------------------------------------------------------
+// Show/hide helpers — explicit per element
+// ---------------------------------------------------------------------------
+
+function show(el: HTMLElement | null) {
+  el?.classList.add('cc-visible');
+}
+
+function hide(el: HTMLElement | null) {
+  el?.classList.remove('cc-visible');
 }
 
 // ---------------------------------------------------------------------------
@@ -106,10 +132,14 @@ function applyUIState(uiState: UIState) {
 
   if (!banner) return;
 
+  // Reset everything first
+  hide(banner);
+  hide(notice);
+  hide(prefs);
+  hide(overlay);
+
   switch (uiState) {
     case 'hidden':
-      banner.classList.remove('cc-visible');
-      overlay?.classList.remove('cc-visible');
       if (previousFocus) {
         previousFocus.focus();
         previousFocus = null;
@@ -117,12 +147,9 @@ function applyUIState(uiState: UIState) {
       break;
 
     case 'banner':
-      banner.classList.add('cc-visible');
-      notice?.classList.remove('cc-hidden');
-      prefs?.classList.remove('cc-visible');
-      overlay?.classList.remove('cc-visible');
+      show(banner);
+      show(notice);
       if (!previousFocus) previousFocus = document.activeElement as HTMLElement;
-      // Focus the banner after transition
       setTimeout(() => {
         const firstBtn = banner.querySelector<HTMLElement>('button, [href], [tabindex]');
         firstBtn?.focus();
@@ -130,11 +157,11 @@ function applyUIState(uiState: UIState) {
       break;
 
     case 'preferences':
-      banner.classList.add('cc-visible');
-      notice?.classList.add('cc-hidden');
-      prefs?.classList.add('cc-visible');
-      overlay?.classList.add('cc-visible');
+      show(banner);
+      show(prefs);
+      show(overlay);
       syncToggles();
+      if (!previousFocus) previousFocus = document.activeElement as HTMLElement;
       if (prefs) {
         setTimeout(() => trapFocus(prefs), 50);
       }
@@ -152,6 +179,10 @@ function on(el: HTMLElement, event: string, handler: EventListener) {
 }
 
 export function bindDOM(): void {
+  // Force wrapper visible — overrides Webflow display:none via inline style
+  const wrapper = $('[data-cc="wrapper"]');
+  if (wrapper) wrapper.style.display = 'block';
+
   // ARIA setup
   const banner = $('[data-cc="banner"]');
   if (banner) {
@@ -207,7 +238,7 @@ export function bindDOM(): void {
   // Escape key to close preferences → back to notice
   function handleEscape(e: KeyboardEvent) {
     if (e.key === 'Escape' && getUIState() === 'preferences') {
-      showBanner(); // back to notice view
+      showBanner();
     }
   }
   document.addEventListener('keydown', handleEscape);
